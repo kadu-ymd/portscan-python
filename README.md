@@ -2,12 +2,17 @@
 
 Atividade de desenvolvimento de um portscanner em Python para a disciplina de Tecnologias Hacker - Engenharia da Computação - Insper 2025.1
 
-## Modo de utilizacao
+## Modo de utilização
 
-Para executar o codigo, basta digitar no terminal um comando com a seguinte sintaxe:
+Para executar o código, basta digitar no terminal um comando com a seguinte sintaxe:
 
-```
-python main.py [-t;-u] [-n;-h] [network;host] [port_range=start,end(default=1,1000)] [ip_range=start,end(default=1,255)]
+```bash
+python main.py 
+	[-t;-u]
+	[-n;-h]
+	[network;host]
+	[port_range=start,end(default=1,1000)]
+	[ip_range=start,end(default=1,255)]
 ```
 
 Exemplo 1 (host): escaneamento do host X.X.X.X

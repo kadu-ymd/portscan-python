@@ -7,7 +7,7 @@ Atividade de desenvolvimento de um portscanner em Python para a disciplina de Te
 Para executar o codigo, basta digitar no terminal um comando com a seguinte sintaxe:
 
 ```
-python main.py [-n;-h] [network;host] [port_range=start,end(default=1,1000)] [ip_range=start,end(default=1,255)]
+python main.py [-t;-u] [-n;-h] [network;host] [port_range=start,end(default=1,1000)] [ip_range=start,end(default=1,255)]
 ```
 
 Exemplo 1 (host): escaneamento do host X.X.X.X

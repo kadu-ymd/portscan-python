@@ -9,13 +9,15 @@ OUTPUT = "./output/scan_results.txt"
 
 socket.setdefaulttimeout(.01)
 
-def scanner(hostname: str, protocol: str, ip_proto: int, start_port: int = 1, end_port: int = 1000):
-    if ip_proto == socket.AF_INET6:
-        target = socket.getaddrinfo(hostname, None, socket.AF_INET6)[0][4][0]
-    else:
-        target = socket.gethostbyname(hostname)
+def scanner(ip: str, 
+            protocol: str, 
+            ip_proto: int, 
+            start_port: int = 1, 
+            end_port: int = 1000
+    ):
 
-    print(f"Nome e endereco do host: {hostname} | {target}")
+    target = socket.getaddrinfo(ip, None, ip_proto)[0][4][0]
+
     print("----------------------------------")
 
     try:
@@ -87,16 +89,14 @@ def main():
         else:
             raise Exception("Sintaxe incorreta: primeiro argumento (protocolo) deve ser -t para TCP ou -u para UDP")
         
-    if len(sys.argv) == 5:
-        version = 0
-
         if sys.argv[3] in ["-v4", "-V4"]:
             version = socket.AF_INET
         elif sys.argv[3] in ["-v6", "-V6"]:
             version = socket.AF_INET6
         else:
             raise Exception("Sintaxe invalida: o argumento do protocolo IP deve ser -v4 ou -v6")
-
+        
+    if len(sys.argv) == 5:
         if sys.argv[2] in ["-n", "-N"]:
             network = sys.argv[4]
 

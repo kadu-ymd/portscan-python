@@ -4,40 +4,45 @@ import datetime
 
 #TODO: finalizar execucao direta via linha de comando e arrumar o range para o IP
 
+OUTPUT = "./output/scan_results.txt"
+
 
 socket.setdefaulttimeout(.01)
 
-def scanner(hostname: str, protocol: str, start_port: int, end_port: int ):
+def scanner(hostname: str, protocol: str, start_port: int = 1, end_port: int = 1000):
     target = socket.gethostbyname(hostname)
 
     print(f"Nome e endereco do host: {hostname} | {target}")
     print("----------------------------------")
-    
+
     try:
         start_time = datetime.datetime.now()
         ports_open = 0
         service = ""
 
         for port in range(start_port, end_port):
-            s = socket.socket()
+            with socket.socket() as s:
+                addr = (target, port)
 
-            addr = (target, port)
+                errno_code = s.connect_ex(addr)
 
-            errno_code = s.connect_ex(addr)
 
-            try:
-                service = socket.getservbyport(port, protocol)
-                if not errno_code:
-                    print(f"Porta {port} - {service} - open")
-                    ports_open += 1
-                elif errno_code in [111, 10061]:
-                    print(f"Porta {port} - {service} - closed")
-                else:
-                    print(f"Porta {port} - {service} - filtered")
-            except OSError:
-                service = "unknown port"
+                try:
+                    service = socket.getservbyport(port, protocol)
 
-            s.close()
+                    result = ""
+
+                    if not errno_code:
+                        result = f"Porta {port} - {service} - open"
+                        ports_open += 1
+                    elif errno_code in [111, 10061]:
+                        result = f"Porta {port} - {service} - closed"
+                    else:
+                        result = f"Porta {port} - {service} - filtered"
+
+                    print(result)
+                except OSError:
+                    service = "unknown port"
 
         runtime = datetime.datetime.now() - start_time
 
@@ -48,29 +53,32 @@ def scanner(hostname: str, protocol: str, start_port: int, end_port: int ):
         raise KeyboardInterrupt("\nOperacao cancelada pelo usuario")
 
 
-def scanNetwork(network: str, protocol: str, start_port: int = 1, end_port: int = 1000):
+def scanNetwork(network: str, protocol: str, start_port: int = 1, end_port: int = 1000, start_ip: int = 1, end_ip: int = 255):
     print(f"Rede a ser escaneada: {network}")
-
-    for ip in range(1, 256):
+    
+    for ip in range(start_ip, end_ip + 1):
         hostname = network + "." + str(ip)
         
         scanner(hostname, protocol, start_port, end_port)
+
+    print(f"Escaneamento da rede finalizada")
     
 
 def main():
-    if len(sys.argv) == 4: # main.py -n/-h network/host
-        protocol = ""
-
+    if len(sys.argv) > 1:
         if sys.argv[1] in ["-u", "-U"]:
             protocol = "udp"
         elif sys.argv[1] in ["-t", "-T"]:
             protocol = "tcp"
         else:
-            raise Exception("Sintaxe incorreta: primeiro argumento deve ser -t ou -u (protocolo)")
+            raise Exception("Sintaxe incorreta: primeiro argumento (protocolo) deve ser -t para TCP ou -u para UDP")
         
+    if len(sys.argv) == 4:
+        protocol = ""
+
         if sys.argv[2] in ["-n", "-N"]:
             network = sys.argv[3]
-            
+
             scanNetwork(network, protocol)
 
         elif sys.argv[2] in ["-h", "-H"]:
@@ -88,32 +96,30 @@ def main():
             except:
                 raise Exception("Sintaxe invalida: verifique se os valores do port_range sao inteiros")
 
-
             if sys.argv[2] in ["-n", "-N"]:
                 network = sys.argv[3]
-                
+
                 scanNetwork(network, protocol, start_port, end_port)
 
             elif sys.argv[2] in ["-h", "-H"]:
                 hostname = sys.argv[3]
 
                 scanner(hostname, protocol, start_port, end_port)
-        
+
         elif sys.argv[4].startswith("ip_range=") and sys.argv[2] in ["-n", "-N"]:
             ip_range = sys.argv[4][9:].split(",")
 
             try:
-                start_port = int(ip_range[0])
-                end_port = int(ip_range[1])
+                start_ip = int(ip_range[0])
+                end_ip = int(ip_range[1])
             except:
                 raise Exception("Sintaxe invalida: verifique se os valores do ip_range sao inteiros")
 
             network = sys.argv[3]
-                
-            scanNetwork(network, protocol, start_port, end_port)
 
+            scanNetwork(network, protocol, start_ip=start_ip, end_ip=end_ip)
         else:
-            raise Exception("Sintaxe invalida")
+            raise Exception("Sintaxe invalida: o ip_range so pode ser utilizado para escaneamento de rede")
         
     elif len(sys.argv) == 6 and sys.argv[2] in ["-n", "-N"]:
         if sys.argv[4].startswith("port_range="):
@@ -125,13 +131,26 @@ def main():
             except:
                 raise Exception("Sintaxe invalida: verifique se os valores do port_range sao inteiros")
             
-            if sys.argv[4].startswith("port_range="):
-        print(port_range)
+            if sys.argv[5].startswith("ip_range="):
+                ip_range = sys.argv[5][9:].split(",")
 
+                try:
+                    start_ip = int(ip_range[0])
+                    end_ip = int(ip_range[1])
+                except:
+                    raise Exception("Sintaxe invalida: verifique se os valores do ip_range sao inteiros")
 
+                network = sys.argv[3]
+
+                scanNetwork(network, protocol, start_port, end_port, start_ip, end_ip)
+            else:
+                raise Exception("Sintaxe invalida: verifique se o ip_range foi utilizado corretamente")
+        else:
+            raise Exception("Sintaxe invalida: verifique se foi utilizada a flag -n")
+    else:
+        raise Exception("Quantidade incorreta de argumentos")
     return 0
 
 
 if __name__ == "__main__":
     main()
-    # print(socket.getservbyport(53))

@@ -2,8 +2,6 @@ import sys
 import socket
 import datetime
 
-#TODO: finalizar execucao direta via linha de comando e arrumar o range para o IP
-
 
 socket.setdefaulttimeout(.2)
 

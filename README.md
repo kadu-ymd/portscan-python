@@ -22,7 +22,7 @@ python main.py
 
 ### Legenda
 
-- `[-t;-u]`: Escaneamento de portas TCP (`-t`) ou UDP (`-f`);
+- `[-t;-u]`: Escaneamento de portas TCP (`-t`) ou UDP (`-u`);
 - `[-n;-h]`: Escaneamento de um host (`-h`) ou rede (`-n`);
 - `[network_ip;host_ip]`: Endereço a ser escaneado, seguindo o formato **X.X.X.X** para host e **X.X.X** para rede¹;
 - `[port_range=start,end(default=1,1000)]`: *Range* de portas a serem escaneadas (*opcional*);

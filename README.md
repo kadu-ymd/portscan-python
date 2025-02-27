@@ -22,9 +22,9 @@ python main.py
 
 ### Legenda
 
-- `[-t;-u]`: Escaneamento de portas TCP (-t) ou UDP (-f);
-- `[-n;-h]`: Escaneamento de um host (-h) ou rede (-n);
-- `[network_ip;host_ip]`: Endereço a ser escaneado, seguindo o formato X.X.X.X para host e X.X.X para rede¹;
+- `[-t;-u]`: Escaneamento de portas TCP (`-t`) ou UDP (`-f`);
+- `[-n;-h]`: Escaneamento de um host (`-h`) ou rede (`-n`);
+- `[network_ip;host_ip]`: Endereço a ser escaneado, seguindo o formato **X.X.X.X** para host e **X.X.X** para rede¹;
 - `[port_range=start,end(default=1,1000)]`: *Range* de portas a serem escaneadas (*opcional*);
 - `[ip_range=start,end(default=1,255)]`: *Range* de IPs a serem escaneados (*opcional*; para quando o escaneamento é da rede).
 
@@ -38,10 +38,12 @@ ___
 - [x] Interface amigável (*user-friendly interface*)
 - [x] Escaneamento de um *host* ou de uma rede
 - [x] Permitir que o usuário insira um *range* de portas a serem escaneadas
-- [x] Prints contendo número da porta e o serviço associado a ela (para *Well-Known ports*)
+- [x] *Prints* contendo número da porta e o serviço associado a ela (para *Well-Known ports*)
 - [x] Detecção dos estados das portas (*open*, *closed*, *filtered*, etc.)
 - [ ] Opção de escaneamento de portas UDP
 - [ ] Descobrir OS através de *banner grabbing*
 - [x] Suporte para IPv6
 
-**OBS**.: o escaneamento da rede funciona apenas para endereços IPv4 (não foi implementada essa funcionalidade para endereços IPv6).
+**OBS 1**.: o escaneamento da rede funciona apenas para endereços IPv4 (não foi implementada essa funcionalidade para endereços IPv6);
+
+**OBS 2**.: a implementacao do escaneamento de portas UDP existe, mas nao funciona corretamente. Logo, pode ser testada, mas nada pode ser concluido a partir dos *prints*.

@@ -4,21 +4,19 @@ import datetime
 
 #TODO: finalizar execucao direta via linha de comando e arrumar o range para o IP
 
-OUTPUT = "./output/scan_results.txt"
 
-
-socket.setdefaulttimeout(.01)
+socket.setdefaulttimeout(.2)
 
 def scanner(ip: str, 
             protocol: str, 
-            ip_proto: int, 
+            ip_version: int,
             start_port: int = 1, 
             end_port: int = 1000
     ):
 
-    target = socket.getaddrinfo(ip, None, ip_proto)[0][4][0]
-
     print("----------------------------------")
+
+    socket_type = socket.SOCK_STREAM
 
     try:
         start_time = datetime.datetime.now()
@@ -26,39 +24,54 @@ def scanner(ip: str,
         service = ""
 
         for port in range(start_port, end_port):
-            with socket.socket(family=ip_proto, type=socket.SOCK_STREAM, proto=0) as s:
-                addr = (target, port)
+            result = ""
 
-                if ip_proto == socket.AF_INET6:
-                    addr = (target, port, 0, 0)
+            try:
+                service = socket.getservbyport(port, protocol)
+            except OSError:
+                continue
 
-                errno_code = s.connect_ex(addr)
+            addrinfo = socket.getaddrinfo(ip, port)
 
+            addr = addrinfo[0][4]
+            socket_type = addrinfo[0][1]
+
+            if protocol == "udp" and len(addrinfo) > 1:
+                addr = addrinfo[1][4]
+                socket_type = addrinfo[1][1]
+
+            with socket.socket(family=ip_version, type=socket_type) as s:
                 try:
-                    service = socket.getservbyport(port, protocol)
-
-                    result = ""
-
+                    errno_code = s.connect_ex(addr)
+                    
                     if not errno_code:
-                        result = f"Porta {port} - {service} - open"
+                        result = f"{port}/{protocol} - {service} - open"
                         ports_open += 1
                     elif errno_code in [111, 10061]:
-                        result = f"Porta {port} - {service} - closed"
+                        result = f"{port}/{protocol} - {service} - closed"
                     else:
-                        result = f"Porta {port} - {service} - filtered"
-
+                        result = f"{port}/{protocol} - {service} - filtered"
+                        
                     print(result)
+
                 except OSError:
                     service = "unknown port"
 
-        runtime = datetime.datetime.now() - start_time
+                except TimeoutError:
+                    raise TimeoutError("Tempo limite atingido")
 
-        print(f"Total de portas abertas encontradas: {ports_open}\n"
-              f"Tempo de execucao: {runtime.seconds:.2f} segundos\n")
+        runtime = datetime.datetime.now() - start_time
+        
+        print(f"\nTotal de portas abertas encontradas: {ports_open}\n"
+              f"Tempo de execucao: {runtime.seconds}.{runtime.microseconds} segundos\n")
 
     except KeyboardInterrupt:
-        raise KeyboardInterrupt("\nOperacao cancelada pelo usuario")
+        runtime = datetime.datetime.now() - start_time
+        
+        print(f"\nTotal de portas abertas encontradas: {ports_open}\n"
+              f"Tempo de execucao: {runtime.seconds}.{runtime.microseconds} segundos\n")
 
+        raise KeyboardInterrupt("\nOperacao cancelada pelo usuario")
 
 def scanNetwork(
         network: str, 
@@ -168,8 +181,10 @@ def main():
                 raise Exception("Sintaxe invalida: verifique se o ip_range foi utilizado corretamente")
         else:
             raise Exception("Sintaxe invalida: verifique se foi utilizada a flag -n")
+   
     else:
         raise Exception("Quantidade incorreta de argumentos")
+        
     return 0
 
 

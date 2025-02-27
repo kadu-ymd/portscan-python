@@ -46,4 +46,4 @@ ___
 
 **OBS 1**.: o escaneamento da rede funciona apenas para endereços IPv4 (não foi implementada essa funcionalidade para endereços IPv6);
 
-**OBS 2**.: a implementacao do escaneamento de portas UDP existe, mas nao funciona corretamente. Logo, pode ser testada, mas nada pode ser concluido a partir dos *prints*.
+**OBS 2**.: a implementação do escaneamento de portas UDP existe, mas não funciona corretamente. Logo, pode ser testada, mas nada pode ser concluído a partir dos *prints*.
